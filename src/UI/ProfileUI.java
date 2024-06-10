@@ -5,15 +5,15 @@
 package UI;
 
 /**
- * Manages user interactions for editing their profile, 
- * displaying the current profile, and updating it based on user input, 
- * with changes saved through the Authentication class
- * 
+ * Manages user interactions for editing their profile, displaying the current
+ * profile, and updating it based on user input, with changes saved through the
+ * Authentication class
+ *
  * @author imshi
  */
-
 import Auth.Authentication;
 import User.User;
+import File.FileHandler;
 
 import javax.swing.*;
 import java.awt.*;
@@ -21,15 +21,18 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ProfileUI extends JFrame {
+
     private final Authentication auth;
+    private final FileHandler fileHandler;
     private JEditorPane currentProfileArea;
     private JTextField bioField;
     private JTextField interestsField;
     private JRadioButton maleRadioButton;
     private JRadioButton femaleRadioButton;
 
-    public ProfileUI(Authentication auth) {
+    public ProfileUI(Authentication auth, FileHandler fileHandler) {
         this.auth = auth;
+        this.fileHandler = fileHandler;
         initializeUI();
     }
 
@@ -43,7 +46,7 @@ public class ProfileUI extends JFrame {
         gbc.insets = new Insets(5, 5, 5, 5);
 
         JLabel currentProfileLabel = new JLabel("Current Profile:");
-        currentProfileLabel.setFont(new Font("Arial", Font.BOLD, 14));
+        currentProfileLabel.setFont(new Font("Arial", Font.BOLD, 24));
         gbc.gridx = 0;
         gbc.gridy = 0;
         gbc.anchor = GridBagConstraints.WEST;
@@ -63,7 +66,7 @@ public class ProfileUI extends JFrame {
         add(scrollPane, gbc);
 
         JLabel bioLabel = new JLabel("Update your bio:");
-        bioLabel.setFont(new Font("Arial", Font.BOLD, 14));
+        bioLabel.setFont(new Font("Arial", Font.BOLD, 24));
         gbc.gridx = 0;
         gbc.gridy = 2;
         gbc.gridwidth = 1;
@@ -74,27 +77,27 @@ public class ProfileUI extends JFrame {
         add(bioLabel, gbc);
 
         bioField = new JTextField(20);
-        bioField.setFont(new Font("Arial", Font.PLAIN, 14));
+        bioField.setFont(new Font("Arial", Font.PLAIN, 24));
         gbc.gridx = 2;
         gbc.gridy = 2;
         gbc.gridwidth = 2;
         add(bioField, gbc);
 
         JLabel interestsLabel = new JLabel("Enter your interests:");
-        interestsLabel.setFont(new Font("Arial", Font.BOLD, 14));
+        interestsLabel.setFont(new Font("Arial", Font.BOLD, 24));
         gbc.gridx = 0;
         gbc.gridy = 3;
         add(interestsLabel, gbc);
 
         interestsField = new JTextField(20);
-        interestsField.setFont(new Font("Arial", Font.PLAIN, 14));
+        interestsField.setFont(new Font("Arial", Font.PLAIN, 24));
         gbc.gridx = 2;
         gbc.gridy = 3;
         gbc.gridwidth = 2;
         add(interestsField, gbc);
 
         JLabel genderLabel = new JLabel("Gender:");
-        genderLabel.setFont(new Font("Arial", Font.BOLD, 14));
+        genderLabel.setFont(new Font("Arial", Font.BOLD, 24));
         gbc.gridx = 0;
         gbc.gridy = 4;
         add(genderLabel, gbc);
@@ -112,7 +115,7 @@ public class ProfileUI extends JFrame {
         add(femaleRadioButton, gbc);
 
         JButton updateButton = new JButton("Update Profile");
-        updateButton.setFont(new Font("Arial", Font.BOLD, 18));
+        updateButton.setFont(new Font("Arial", Font.BOLD, 24));
         updateButton.addActionListener(e -> updateProfile());
         gbc.gridx = 2;
         gbc.gridy = 5;
@@ -133,8 +136,12 @@ public class ProfileUI extends JFrame {
             profileBuilder.append("<b>Bio:</b> ").append(currentUser.getProfile().getBio()).append("<br>");
             profileBuilder.append("<b>Gender:</b> ").append(currentUser.getProfile().getGender()).append("<br>");
             profileBuilder.append("<b>Interests:</b><br>");
-            for (String interest : currentUser.getProfile().getInterests()) {
-                profileBuilder.append("- ").append(interest).append("<br>");
+            if (currentUser.getProfile().getInterests().isEmpty()) {
+                profileBuilder.append("-");
+            } else {
+                for (String interest : currentUser.getProfile().getInterests()) {
+                    profileBuilder.append("- ").append(interest).append("<br>");
+                }
             }
             profileBuilder.append("</html>");
 
@@ -142,7 +149,7 @@ public class ProfileUI extends JFrame {
 
             if (currentUser.getProfile().getGender().equalsIgnoreCase("male")) {
                 maleRadioButton.setSelected(true);
-            } else {
+            } else if (currentUser.getProfile().getGender().equalsIgnoreCase("female")) {
                 femaleRadioButton.setSelected(true);
             }
         }
@@ -168,15 +175,16 @@ public class ProfileUI extends JFrame {
             }
 
             if (maleRadioButton.isSelected()) {
-                currentUser.getProfile().setGender("male");
+                currentUser.getProfile().setGender("Male");
             } else if (femaleRadioButton.isSelected()) {
-                currentUser.getProfile().setGender("female");
+                currentUser.getProfile().setGender("Female");
             }
 
             auth.saveUsers();
 
             JOptionPane.showMessageDialog(this, "Profile updated successfully!");
-            displayCurrentProfile();
+            dispose();
+            new HomeUI(auth, fileHandler).setVisible(true);
         }
     }
 }

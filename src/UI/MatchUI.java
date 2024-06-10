@@ -4,64 +4,68 @@ package UI;
  * @author imshi
  */
 
-import Auth.SessionManager;
 import User.User;
+import Auth.Authentication;
+import File.FileHandler;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.List;
 
 public class MatchUI extends JFrame {
-    private JTextArea matchTextArea;
+    private final List<User> matchedUsers;
+    private final Authentication auth;
+    private final FileHandler fileHandler;
 
-    public MatchUI() {
+    public MatchUI(List<User> matchedUsers, Authentication auth, FileHandler fileHandler) {
+        this.matchedUsers = matchedUsers;
+        this.auth = auth;
+        this.fileHandler = fileHandler;
         initializeUI();
     }
 
     private void initializeUI() {
-        setTitle("Match Viewer");
+        setTitle("Matched Users");
         setSize(1100, 650);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLocationRelativeTo(null);
-        setLayout(new BorderLayout(10, 10));
+        setLayout(new BorderLayout());
 
-        matchTextArea = new JTextArea();
-        matchTextArea.setEditable(false);
-        matchTextArea.setFont(new Font("Arial", Font.PLAIN, 18));
-        JScrollPane scrollPane = new JScrollPane(matchTextArea);
+        JTextArea textArea = new JTextArea();
+        textArea.setEditable(false);
+        textArea.setFont(new Font("Times New Roman", Font.PLAIN, 20));
+        JScrollPane scrollPane = new JScrollPane(textArea);
 
-        JButton doneButton = new JButton("Done");
-        doneButton.setFont(new Font("Arial", Font.BOLD, 24));
-        doneButton.setPreferredSize(new Dimension(200, 50));
-        doneButton.addActionListener(e -> dispose());
-
-        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-        buttonPanel.add(doneButton);
+        StringBuilder builder = new StringBuilder();
+        for (User user : matchedUsers) {
+            builder.append(formatUser(user)).append("\n\n");
+        }
+        textArea.setText(builder.toString());
 
         add(scrollPane, BorderLayout.CENTER);
-        add(buttonPanel, BorderLayout.SOUTH);
+
+        JButton backButton = new JButton("Back to Home");
+        backButton.setFont(new Font("Arial", Font.BOLD, 20));
+        backButton.setPreferredSize(new Dimension(1100, 80));
+        backButton.setBackground(Color.BLACK);
+        backButton.setForeground(Color.WHITE);
+        backButton.setFocusPainted(false);
+        backButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                dispose();
+                new HomeUI(auth, fileHandler).setVisible(true);
+            }
+        });
+
+        add(backButton, BorderLayout.SOUTH);
     }
 
-    public void displayMatches(List<User> matchedUsers) {
-        if (matchedUsers == null || matchedUsers.isEmpty()) {
-            matchTextArea.setText("No matches to display.");
-            return;
-        }
-
-        StringBuilder matchesBuilder = new StringBuilder();
-        for (int i = 1; i <= matchedUsers.size(); i++) {
-            matchesBuilder.append("Lover ").append(i).append("\n");
-            matchesBuilder.append(matchedUsers.get(i - 1).toString()).append("\n\n");
-        }
-        matchTextArea.setText(matchesBuilder.toString());
-    }
-
-    public void displayViewMatches(List<User> matchedUsers) {
-        if (SessionManager.isLoggedIn()) {
-            displayMatches(matchedUsers);
-            setVisible(true);
-        } else {
-            JOptionPane.showMessageDialog(this, "Please login first.");
-        }
+    private String formatUser(User user) {
+        return user.getUsername() + ": " + user.getProfile().getAge() + ", " +
+                user.getProfile().getLocation() + ", " + user.getProfile().getBio() + ", " +
+                String.join(", ", user.getProfile().getInterests()) + ", " + user.getProfile().getGender();
     }
 }

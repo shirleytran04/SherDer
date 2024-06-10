@@ -23,6 +23,7 @@ import java.awt.image.BufferedImage;
 import javax.imageio.ImageIO;
 
 public class WelcomeMessageUI extends JFrame {
+
     private JButton startButton;
     private JLabel welcomeLabel1;
     private JLabel welcomeLabel2;
@@ -45,48 +46,39 @@ public class WelcomeMessageUI extends JFrame {
 
         try {
             InputStream iconInputStream = getClass().getResourceAsStream("/resources/icon.png");
-            if (iconInputStream != null) {
-                BufferedImage iconImage = ImageIO.read(iconInputStream);
-                setIconImage(iconImage);
-            }
+            BufferedImage iconImage = ImageIO.read(iconInputStream);
+            setIconImage(iconImage);
+
         } catch (Exception e) {
             e.printStackTrace();
         }
 
         JLabel backgroundLabel = new JLabel();
         InputStream bgInputStream = getClass().getResourceAsStream("/resources/bg.jpg");
-        if (bgInputStream != null) {
-            try {
-                BufferedImage bgImage = ImageIO.read(bgInputStream);
-                Image scaledBgImage = bgImage.getScaledInstance(1100, 650, Image.SCALE_SMOOTH);
-                backgroundLabel.setIcon(new ImageIcon(scaledBgImage));
-                backgroundLabel.setSize(1100, 650);
-                backgroundLabel.setHorizontalAlignment(SwingConstants.CENTER);
-                backgroundLabel.setVerticalAlignment(SwingConstants.CENTER);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+        try {
+            BufferedImage bgImage = ImageIO.read(bgInputStream);
+            Image scaledBgImage = bgImage.getScaledInstance(1100, 650, Image.SCALE_SMOOTH);
+            backgroundLabel.setIcon(new ImageIcon(scaledBgImage));
+            backgroundLabel.setSize(1100, 650);
+            backgroundLabel.setHorizontalAlignment(SwingConstants.CENTER);
+            backgroundLabel.setVerticalAlignment(SwingConstants.CENTER);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
 
         Font balloonFont = null;
         Font heyamFont = null;
         try {
             InputStream balloonFontInputStream = getClass().getResourceAsStream("/resources/balloon.ttf");
-            if (balloonFontInputStream != null) {
-                balloonFont = Font.createFont(Font.TRUETYPE_FONT, balloonFontInputStream).deriveFont(32f);
-                GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
-                ge.registerFont(balloonFont);
-            } else {
-                balloonFont = new Font("Arial", Font.BOLD, 32);
-            }
+            balloonFont = Font.createFont(Font.TRUETYPE_FONT, balloonFontInputStream).deriveFont(32f);
+            GraphicsEnvironment g = GraphicsEnvironment.getLocalGraphicsEnvironment();
+            g.registerFont(balloonFont);
+
             InputStream heyamFontInputStream = getClass().getResourceAsStream("/resources/heyam.ttf");
-            if (heyamFontInputStream != null) {
-                heyamFont = Font.createFont(Font.TRUETYPE_FONT, heyamFontInputStream).deriveFont(25f);
-                GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
-                ge.registerFont(heyamFont);
-            } else {
-                heyamFont = new Font("Arial", Font.BOLD, 18);
-            }
+
+            heyamFont = Font.createFont(Font.TRUETYPE_FONT, heyamFontInputStream).deriveFont(25f);
+            GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
+            ge.registerFont(heyamFont);
         } catch (Exception e) {
             e.printStackTrace();
             balloonFont = new Font("Arial", Font.BOLD, 32);
@@ -95,16 +87,13 @@ public class WelcomeMessageUI extends JFrame {
 
         JLayeredPane layeredPane = new JLayeredPane();
         layeredPane.setPreferredSize(new Dimension(1100, 650));
-
-        if (backgroundLabel.getIcon() != null) {
-            backgroundLabel.setSize(1100, 650);
-            layeredPane.add(backgroundLabel, Integer.valueOf(0));
-        }
+        backgroundLabel.setSize(1100, 650);
+        layeredPane.add(backgroundLabel, Integer.valueOf(0));
 
         JPanel panel = new JPanel(new GridBagLayout());
         panel.setOpaque(false);
         GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(5, 20, 5, 20); 
+        gbc.insets = new Insets(5, 20, 5, 20);
         gbc.anchor = GridBagConstraints.CENTER;
 
         welcomeLabel1 = createLabel("Welcome to", balloonFont);
@@ -112,31 +101,29 @@ public class WelcomeMessageUI extends JFrame {
 
         gbc.gridx = 0;
         gbc.gridy = 0;
-        gbc.insets = new Insets(0, 0, 0, 0); 
+        gbc.insets = new Insets(0, 0, 0, 0);
         panel.add(welcomeLabel1, gbc);
 
         gbc.gridy++;
-        gbc.insets = new Insets(0, 0, -50, 0); 
+        gbc.insets = new Insets(0, 0, -50, 0);
         panel.add(welcomeLabel2, gbc);
 
         imageLabel = new JLabel();
         InputStream imageInputStream = getClass().getResourceAsStream("/resources/welcome.png");
-        if (imageInputStream != null) {
-            try {
-                BufferedImage image = ImageIO.read(imageInputStream);
-                Image scaledImage = image.getScaledInstance(400, 300, Image.SCALE_SMOOTH); 
-                imageLabel.setIcon(new ImageIcon(scaledImage));
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+        try {
+            BufferedImage image = ImageIO.read(imageInputStream);
+            Image scaledImage = image.getScaledInstance(400, 300, Image.SCALE_SMOOTH);
+            imageLabel.setIcon(new ImageIcon(scaledImage));
+        } catch (Exception e) {
+            e.printStackTrace();
         }
 
         gbc.gridy++;
-        gbc.insets = new Insets(0, 0, -25, 0); 
+        gbc.insets = new Insets(0, 0, -25, 0);
         panel.add(imageLabel, gbc);
 
         gbc.gridy++;
-        gbc.insets = new Insets(0, 10, 10, 0); 
+        gbc.insets = new Insets(0, 10, 10, 0);
         startButton = createStartButton(heyamFont.deriveFont(25f));
         panel.add(startButton, gbc);
 
@@ -152,60 +139,56 @@ public class WelcomeMessageUI extends JFrame {
     private JLabel createLabel(String text, Font font) {
         JLabel label = new JLabel(text);
         label.setFont(font);
-        label.setForeground(new Color(255, 20, 147)); 
+        label.setForeground(new Color(255, 20, 147));
         label.setHorizontalAlignment(SwingConstants.CENTER);
         return label;
     }
 
     private JButton createStartButton(Font font) {
         JButton button = new JButton("START APPLICATION") {
-        protected void paintComponent(Graphics g) {
-            if (getModel().isArmed()) {
-                g.setColor(new Color(243, 58, 106)); 
-            } else {
-                g.setColor(new Color(255, 105, 180)); 
+            protected void paintComponent(Graphics g) {
+                if (getModel().isPressed()) {
+                    g.setColor(new Color(243, 58, 106));
+                } else if (getModel().isRollover()) {
+                    g.setColor(new Color(243, 58, 106));
+                } else {
+                    g.setColor(new Color(255, 105, 180));
+                }
+                g.fillRoundRect(0, 0, getWidth(), getHeight(), 30, 30);
+                super.paintComponent(g);
             }
-            g.fillRoundRect(0, 0, getWidth(), getHeight(), 30, 30);
-            super.paintComponent(g);
-        }
 
-        protected void paintBorder(Graphics g) {
-            g.setColor(getBackground());
-            g.drawRoundRect(0, 0, getWidth() - 1, getHeight() - 1, 30, 30);
-        }
-    };
-    button.setFont(font);
-    button.setForeground(Color.WHITE); 
-    button.setContentAreaFilled(false);
-    button.setFocusPainted(false);
-    button.setPreferredSize(new Dimension(250, 50));
-    button.addActionListener(startButtonAction());
+            protected void paintBorder(Graphics g) {
+                g.setColor(getBackground());
+                g.drawRoundRect(0, 0, getWidth() - 1, getHeight() - 1, 30, 30);
+            }
+        };
+        button.setFont(font);
+        button.setForeground(Color.WHITE);
+        button.setContentAreaFilled(false);
+        button.setFocusPainted(false);
+        button.setPreferredSize(new Dimension(250, 50));
+        button.addActionListener(startButtonAction());
 
-    button.addMouseListener(new MouseAdapter() {
-        public void mouseEntered(MouseEvent e) {
-            button.setFont(font.deriveFont(28f)); 
-            button.setPreferredSize(new Dimension(260, 60));
-            button.setBackground(new Color(192, 57, 43));
-            button.setForeground(Color.WHITE); 
-            button.repaint(); 
-        }
+        button.addMouseListener(new MouseAdapter() {
+            public void mouseEntered(MouseEvent e) {
+                button.setFont(font.deriveFont(28f));
+                button.setPreferredSize(new Dimension(260, 60));
+                button.repaint();
+            }
 
-        public void mouseExited(MouseEvent e) {
-            button.setFont(font.deriveFont(25f));
-            button.setPreferredSize(new Dimension(250, 50)); 
-            button.setBackground(new Color(255, 105, 180)); 
-            button.setForeground(Color.WHITE); 
-            button.repaint();
-        }
-    });
-
-    return button;
+            public void mouseExited(MouseEvent e) {
+                button.setFont(font.deriveFont(25f));
+                button.setPreferredSize(new Dimension(250, 50));
+                button.repaint();
+            }
+        });
+        return button;
     }
-    
-    
+
     private ActionListener startButtonAction() {
         return e -> {
-            new MainMenuUI(auth, fileHandler).setVisible(true);
+            new HomeUI(auth, fileHandler).setVisible(true);
             dispose();
         };
     }

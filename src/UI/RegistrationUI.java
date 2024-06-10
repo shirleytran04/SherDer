@@ -5,10 +5,6 @@
 package UI;
 
 /**
- * Handles the registration process for new users, 
- * collecting essential information 
- * and verifying conditions before creating an account 
- * through the Authentication class
  * 
  * @author imshi
  */
@@ -27,7 +23,7 @@ public class RegistrationUI extends JFrame {
     private JTextField locationField;
     private JRadioButton maleRadioButton;
     private JRadioButton femaleRadioButton;
-    private Authentication auth;
+    private final Authentication auth;
 
     public RegistrationUI(Authentication auth) {
         this.auth = auth;
@@ -36,9 +32,14 @@ public class RegistrationUI extends JFrame {
 
     private void initializeUI() {
         setTitle("Register");
-        setSize(1100, 650);
+        setSize(650, 530);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLocationRelativeTo(null);
+        setLayout(new BorderLayout());
+
+        JPanel panel = new JPanel(new GridBagLayout());
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(10, 10, 10, 10);
 
         JLabel usernameLabel = new JLabel("Username:");
         JLabel passwordLabel = new JLabel("Password:");
@@ -46,10 +47,10 @@ public class RegistrationUI extends JFrame {
         JLabel locationLabel = new JLabel("Location:");
         JLabel genderLabel = new JLabel("Gender:");
 
-        usernameField = new JTextField();
-        passwordField = new JPasswordField();
-        ageField = new JTextField();
-        locationField = new JTextField();
+        usernameField = new JTextField(20);
+        passwordField = new JPasswordField(20);
+        ageField = new JTextField(20);
+        locationField = new JTextField(20);
 
         maleRadioButton = new JRadioButton("Male");
         femaleRadioButton = new JRadioButton("Female");
@@ -58,7 +59,6 @@ public class RegistrationUI extends JFrame {
         genderGroup.add(femaleRadioButton);
 
         JButton registerButton = new JButton("Register");
-        registerButton.setFont(new Font("Arial", Font.BOLD, 18));
         registerButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -66,29 +66,54 @@ public class RegistrationUI extends JFrame {
             }
         });
 
-        JPanel panel = new JPanel(new GridLayout(7, 2));
-        panel.add(usernameLabel);
-        panel.add(usernameField);
-        panel.add(passwordLabel);
-        panel.add(passwordField);
-        panel.add(ageLabel);
-        panel.add(ageField);
-        panel.add(locationLabel);
-        panel.add(locationField);
-        panel.add(genderLabel);
-        panel.add(maleRadioButton);
-        panel.add(new JLabel());
-        panel.add(femaleRadioButton);
-        panel.add(new JLabel()); 
-        panel.add(registerButton);
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        panel.add(usernameLabel, gbc);
 
-        add(panel);
+        gbc.gridx = 1;
+        panel.add(usernameField, gbc);
+
+        gbc.gridx = 0;
+        gbc.gridy++;
+        panel.add(passwordLabel, gbc);
+
+        gbc.gridx = 1;
+        panel.add(passwordField, gbc);
+
+        gbc.gridx = 0;
+        gbc.gridy++;
+        panel.add(ageLabel, gbc);
+
+        gbc.gridx = 1;
+        panel.add(ageField, gbc);
+
+        gbc.gridx = 0;
+        gbc.gridy++;
+        panel.add(locationLabel, gbc);
+
+        gbc.gridx = 1;
+        panel.add(locationField, gbc);
+
+        gbc.gridx = 0;
+        gbc.gridy++;
+        panel.add(genderLabel, gbc);
+
+        gbc.gridx = 1;
+        panel.add(maleRadioButton, gbc);
+
+        gbc.gridy++;
+        panel.add(femaleRadioButton, gbc);
+
+        gbc.gridy++;
+        panel.add(registerButton, gbc);
+
+        add(panel, BorderLayout.CENTER);
     }
 
     private void handleRegistration() {
-        String username = usernameField.getText();
-        String password = new String(passwordField.getPassword());
-        int age = 0;
+        String username = usernameField.getText().trim();
+        String password = new String(passwordField.getPassword()).trim();
+        int age;
         boolean validAge = false;
 
         try {
@@ -100,22 +125,25 @@ public class RegistrationUI extends JFrame {
             }
         } catch (NumberFormatException e) {
             JOptionPane.showMessageDialog(this, "Invalid input. Please enter a valid age.");
+            return;
         }
 
         String location = locationField.getText().trim();
-        if (location.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Location cannot be empty.");
+        if (location.isEmpty() || !location.matches("[a-zA-Z ]+")) {
+            JOptionPane.showMessageDialog(this, "Location cannot be empty and must contain only letters.");
+            return;
         }
 
         if (!maleRadioButton.isSelected() && !femaleRadioButton.isSelected()) {
             JOptionPane.showMessageDialog(this, "Please select your gender.");
+            return;
         }
 
-        if (validAge && !location.isEmpty() && (maleRadioButton.isSelected() || femaleRadioButton.isSelected())) {
-            String gender = maleRadioButton.isSelected() ? "male" : "female";
+        if (validAge && !location.isEmpty() && !location.matches(".*\\d.*") && (maleRadioButton.isSelected() || femaleRadioButton.isSelected())) {
+            String gender = maleRadioButton.isSelected() ? "Male" : "Female";
             if (auth.register(username, password, age, location, gender)) {
                 JOptionPane.showMessageDialog(this, "Registration successful.");
-                dispose(); 
+                dispose();
             } else {
                 JOptionPane.showMessageDialog(this, "Registration failed. Username might be taken.");
             }
